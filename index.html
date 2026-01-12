@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hitung Mundur Ramadan</title>
+
+<!-- 🔥 ADDRESS BAR HIJAU -->
+<meta name="theme-color" content="#0f5c2e">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* === TOP LOADER === */
+#topLoader{
+  position:fixed;
+  top:0;left:0;
+  width:0%;
+  height:3px;
+  background:#f9e547;
+  box-shadow:0 0 12px rgba(249,229,71,.9);
+  z-index:9999;
+  transition:width .3s ease;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:monospace;
+  color:#f9e547;
+  background:
+    linear-gradient(rgba(0,40,20,.75), rgba(0,40,20,.75)),
+    url("https://files.catbox.moe/f9y1f1.jpg") center/cover no-repeat;
+}
+
+.box{
+  background:rgba(0,60,30,.65);
+  border:2px solid #f9e547;
+  padding:30px;
+  text-align:center;
+  border-radius:14px;
+  box-shadow:0 0 25px rgba(249,229,71,.6);
+  backdrop-filter: blur(6px);
+}
+
+h1{
+  font-size:26px;
+  color:#ffe873;
+  text-shadow:0 0 12px rgba(255,232,115,.8);
+}
+
+.subtitle{
+  font-size:13px;
+  color:#d9ffb3;
+  margin-top:4px;
+}
+
+.datetime{
+  margin-top:10px;
+  font-size:13px;
+  color:#c9ff9e;
+}
+
+/* === TOGGLE === */
+.toggle{
+  margin-top:14px;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+}
+
+.toggle button{
+  padding:6px 12px;
+  font-size:11px;
+  background:rgba(0,0,0,.35);
+  color:#f9e547;
+  border:1px solid #f9e547;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.toggle button.active{
+  background:#f9e547;
+  color:#003b1d;
+  font-weight:bold;
+}
+
+/* === COUNTDOWN === */
+.countdown{
+  margin-top:18px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+
+.unit{
+  background:rgba(0,0,0,.35);
+  border:1px solid #f9e547;
+  border-radius:10px;
+  padding:10px 12px;
+  min-width:70px;
+  box-shadow:0 0 12px rgba(249,229,71,.35);
+}
+
+.num{
+  font-size:24px;
+  font-weight:bold;
+  animation: flip .6s ease;
+}
+
+.label{
+  font-size:10px;
+  margin-top:2px;
+  color:#d9ffb3;
+}
+
+@keyframes flip{
+  0%{transform:rotateX(90deg);opacity:0}
+  100%{transform:rotateX(0);opacity:1}
+}
+
+.ramadan{
+  margin-top:14px;
+  font-size:15px;
+  color:#aaff7a;
+}
+
+.marquee{
+  margin-top:14px;
+  font-size:11px;
+  opacity:.85;
+}
+
+.wm{
+  margin-top:8px;
+  font-size:10px;
+  opacity:.6;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOP LOADER -->
+<div id="topLoader"></div>
+
+<div class="box">
+  <h1>🌙 Ramadan Kareem</h1>
+
+  <div class="subtitle">
+    Hitung Mundur Menuju Awal Ramadan
+  </div>
+
+  <div class="datetime" id="datetime"></div>
+
+  <div class="toggle">
+    <button id="btnMuh" class="active">Muhammadiyah</button>
+    <button id="btnNU">NU (Rukyat)</button>
+  </div>
+
+  <div class="countdown">
+    <div class="unit"><div class="num" id="d">--</div><div class="label">HARI</div></div>
+    <div class="unit"><div class="num" id="h">--</div><div class="label">JAM</div></div>
+    <div class="unit"><div class="num" id="m">--</div><div class="label">MENIT</div></div>
+    <div class="unit"><div class="num" id="s">--</div><div class="label">DETIK</div></div>
+  </div>
+
+  <div class="ramadan" id="ramadanText">✨ Marhaban Ya Ramadan ✨</div>
+
+  <marquee class="marquee">
+    ⚠️ Tanggal dapat berubah sesuai rukyat & hilal ⚠️
+  </marquee>
+
+  <div class="wm">Made By Redxz & AI</div>
+</div>
+
+<script>
+/* === TARGET DATE === */
+const dates={
+  muh:new Date("2026-02-18T00:00:00").getTime(),
+  nu:new Date("2026-02-19T00:00:00").getTime()
+};
+let current=dates.muh;
+
+/* === TOGGLE === */
+btnMuh.onclick=()=>{
+  current=dates.muh;
+  btnMuh.classList.add("active");
+  btnNU.classList.remove("active");
+};
+btnNU.onclick=()=>{
+  current=dates.nu;
+  btnNU.classList.add("active");
+  btnMuh.classList.remove("active");
+};
+
+/* === DATETIME === */
+function updateDate(){
+  const n=new Date();
+  const date=n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const t=[n.getHours(),n.getMinutes(),n.getSeconds()].map(v=>String(v).padStart(2,"0")).join(".");
+  datetime.innerHTML=`${date} | ${t}`;
+}
+
+/* === COUNTDOWN === */
+function updateCountdown(){
+  let diff=current-Date.now();
+  if(diff<=0){
+    ["d","h","m","s"].forEach(i=>document.getElementById(i).textContent="00");
+    ramadanText.innerHTML="🌙 <b>Marhaban Ya Ramadan</b>";
+    return;
+  }
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor(diff/3600000%24);
+  const m=Math.floor(diff/60000%60);
+  const s=Math.floor(diff/1000%60);
+  dEl.textContent=d;
+  hEl.textContent=String(h).padStart(2,"0");
+  mEl.textContent=String(m).padStart(2,"0");
+  sEl.textContent=String(s).padStart(2,"0");
+}
+
+/* === TOP LOADER ANIMATION === */
+let load=0;
+const loader=document.getElementById("topLoader");
+const loadInt=setInterval(()=>{
+  load+=Math.random()*18;
+  if(load>=100){
+    load=100;
+    loader.style.width="100%";
+    setTimeout(()=>loader.style.opacity="0",400);
+    clearInterval(loadInt);
+  }
+  loader.style.width=load+"%";
+},120);
+
+const dEl=document.getElementById("d");
+const hEl=document.getElementById("h");
+const mEl=document.getElementById("m");
+const sEl=document.getElementById("s");
+
+updateDate();
+updateCountdown();
+setInterval(()=>{
+  updateDate();
+  updateCountdown();
+},1000);
+</script>
+
+</body>
+</html>
