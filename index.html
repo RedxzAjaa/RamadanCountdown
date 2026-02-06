@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Hitung Mundur Ramadan</title>
-
 <meta name="theme-color" content="#0f5c2e">
 
 <style>
@@ -58,9 +57,35 @@ h1{
 }
 
 .datetime{
-  margin-top:10px;
+  margin-top:8px;
   font-size:13px;
   color:#c9ff9e;
+}
+
+/* === HIJRI === */
+.hijri{
+  margin-top:6px;
+  font-size:12px;
+  color:#aaff7a;
+}
+
+/* === RAMADAN BADGE === */
+.ramadan-badge{
+  margin-top:6px;
+  padding:6px 14px;
+  font-size:11px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#1fa45c,#f9e547);
+  color:#003b1d;
+  font-weight:bold;
+  box-shadow:0 0 14px rgba(249,229,71,.8);
+  animation: glow 2s infinite ease-in-out;
+  display:none;
+}
+
+@keyframes glow{
+  0%,100%{box-shadow:0 0 10px rgba(249,229,71,.6)}
+  50%{box-shadow:0 0 22px rgba(249,229,71,1)}
 }
 
 /* === TOGGLE === */
@@ -160,10 +185,11 @@ h1{
 
 <div class="box">
   <h1>🌙 Ramadan Kareem</h1>
-
   <div class="subtitle">Hitung Mundur Menuju Awal Ramadan</div>
 
   <div class="datetime" id="datetime"></div>
+  <div class="hijri" id="hijriDate"></div>
+  <div class="ramadan-badge" id="ramadanBadge">🌙 BULAN RAMADAN</div>
 
   <div class="toggle">
     <button id="btnMuh" class="active">Muhammadiyah</button>
@@ -184,12 +210,9 @@ h1{
   </marquee>
 
   <div class="wm">Made By RedxzAjaa</div>
-
-  <!-- 🔊 BACKSOUND BUTTON -->
   <button class="music-btn" id="musicBtn">PUTAR BACKSOUND 🌙✨</button>
 </div>
 
-<!-- AUDIO -->
 <audio id="bgMusic" loop>
   <source src="https://files.catbox.moe/kf2cym.m4a" type="audio/mp4">
 </audio>
@@ -214,12 +237,40 @@ btnNU.onclick=()=>{
   btnMuh.classList.remove("active");
 };
 
-/* === DATETIME === */
+/* === DATE === */
 function updateDate(){
   const n=new Date();
-  const date=n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-  const t=[n.getHours(),n.getMinutes(),n.getSeconds()].map(v=>String(v).padStart(2,"0")).join(".");
-  datetime.innerHTML=`${date} | ${t}`;
+  datetime.innerHTML =
+    n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+
+    " | "+n.toLocaleTimeString("id-ID");
+}
+
+/* === HIJRI FIX TOTAL === */
+function updateHijri(){
+  const now=new Date();
+
+  const parts=new Intl.DateTimeFormat("en-TN-u-ca-islamic",{
+    day:"numeric",
+    month:"numeric",
+    year:"numeric"
+  }).formatToParts(now);
+
+  let day,month,year;
+  parts.forEach(p=>{
+    if(p.type==="day") day=p.value;
+    if(p.type==="month") month=p.value;
+    if(p.type==="year") year=p.value;
+  });
+
+  const hijriMonths=[
+    "Muharram","Safar","Rabiul Awal","Rabiul Akhir",
+    "Jumadil Awal","Jumadil Akhir","Rajab","Syaban",
+    "Ramadan","Syawal","Zulkaidah","Zulhijjah"
+  ];
+
+  const monthName=hijriMonths[month-1];
+  hijriDate.innerHTML=`| ${day} ${monthName} ${year} H`;
+  ramadanBadge.style.display=monthName==="Ramadan"?"inline-block":"none";
 }
 
 /* === COUNTDOWN === */
@@ -230,52 +281,30 @@ function updateCountdown(){
     ramadanText.innerHTML="🌙 <b>Marhaban Ya Ramadan</b>";
     return;
   }
-  dEl.textContent=Math.floor(diff/86400000);
-  hEl.textContent=String(Math.floor(diff/3600000%24)).padStart(2,"0");
-  mEl.textContent=String(Math.floor(diff/60000%60)).padStart(2,"0");
-  sEl.textContent=String(Math.floor(diff/1000%60)).padStart(2,"0");
+  d.textContent=Math.floor(diff/86400000);
+  h.textContent=String(Math.floor(diff/3600000%24)).padStart(2,"0");
+  m.textContent=String(Math.floor(diff/60000%60)).padStart(2,"0");
+  s.textContent=String(Math.floor(diff/1000%60)).padStart(2,"0");
 }
 
-/* === TOP LOADER === */
-let load=0;
-const loader=document.getElementById("topLoader");
-const loadInt=setInterval(()=>{
-  load+=Math.random()*18;
-  if(load>=100){
-    load=100;
-    loader.style.width="100%";
-    setTimeout(()=>loader.style.opacity="0",400);
-    clearInterval(loadInt);
-  }
-  loader.style.width=load+"%";
-},120);
-
 /* === BACKSOUND === */
-const audio=document.getElementById("bgMusic");
-const btn=document.getElementById("musicBtn");
-audio.volume=0.2;
-let playing=false;
-
+const audio=bgMusic,btn=musicBtn;
+audio.volume=.2;let playing=false;
 btn.onclick=()=>{
-  if(!playing){
-    audio.play();
-    btn.textContent="MATIKAN BACKSOUND 🔇";
-    playing=true;
-  }else{
-    audio.pause();
-    btn.textContent="PUTAR BACKSOUND 🌙✨";
-    playing=false;
-  }
+  playing?audio.pause():audio.play();
+  btn.textContent=playing?"PUTAR BACKSOUND 🌙✨":"MATIKAN BACKSOUND 🔇";
+  playing=!playing;
 };
 
-const dEl=document.getElementById("d");
-const hEl=document.getElementById("h");
-const mEl=document.getElementById("m");
-const sEl=document.getElementById("s");
-
+/* === INIT === */
 updateDate();
+updateHijri();
 updateCountdown();
-setInterval(()=>{updateDate();updateCountdown()},1000);
+setInterval(()=>{
+  updateDate();
+  updateHijri();
+  updateCountdown();
+},1000);
 </script>
 
 </body>
