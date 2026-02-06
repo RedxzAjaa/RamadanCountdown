@@ -6,7 +6,6 @@
 
 <title>Hitung Mundur Ramadan</title>
 
-<!-- 🔥 ADDRESS BAR HIJAU -->
 <meta name="theme-color" content="#0f5c2e">
 
 <style>
@@ -139,20 +138,30 @@ h1{
   font-size:10px;
   opacity:.6;
 }
+
+/* === BACKSOUND BUTTON === */
+.music-btn{
+  margin-top:14px;
+  padding:8px 16px;
+  font-size:12px;
+  background:rgba(0,0,0,.4);
+  color:#ffe873;
+  border:1px solid #f9e547;
+  border-radius:20px;
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(249,229,71,.4);
+}
 </style>
 </head>
 
 <body>
 
-<!-- TOP LOADER -->
 <div id="topLoader"></div>
 
 <div class="box">
   <h1>🌙 Ramadan Kareem</h1>
 
-  <div class="subtitle">
-    Hitung Mundur Menuju Awal Ramadan
-  </div>
+  <div class="subtitle">Hitung Mundur Menuju Awal Ramadan</div>
 
   <div class="datetime" id="datetime"></div>
 
@@ -175,7 +184,15 @@ h1{
   </marquee>
 
   <div class="wm">Made By RedxzAjaa</div>
+
+  <!-- 🔊 BACKSOUND BUTTON -->
+  <button class="music-btn" id="musicBtn">PUTAR BACKSOUND 🌙✨</button>
 </div>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+  <source src="https://files.catbox.moe/kf2cym.m4a" type="audio/mp4">
+</audio>
 
 <script>
 /* === TARGET DATE === */
@@ -213,17 +230,13 @@ function updateCountdown(){
     ramadanText.innerHTML="🌙 <b>Marhaban Ya Ramadan</b>";
     return;
   }
-  const d=Math.floor(diff/86400000);
-  const h=Math.floor(diff/3600000%24);
-  const m=Math.floor(diff/60000%60);
-  const s=Math.floor(diff/1000%60);
-  dEl.textContent=d;
-  hEl.textContent=String(h).padStart(2,"0");
-  mEl.textContent=String(m).padStart(2,"0");
-  sEl.textContent=String(s).padStart(2,"0");
+  dEl.textContent=Math.floor(diff/86400000);
+  hEl.textContent=String(Math.floor(diff/3600000%24)).padStart(2,"0");
+  mEl.textContent=String(Math.floor(diff/60000%60)).padStart(2,"0");
+  sEl.textContent=String(Math.floor(diff/1000%60)).padStart(2,"0");
 }
 
-/* === TOP LOADER ANIMATION === */
+/* === TOP LOADER === */
 let load=0;
 const loader=document.getElementById("topLoader");
 const loadInt=setInterval(()=>{
@@ -237,6 +250,24 @@ const loadInt=setInterval(()=>{
   loader.style.width=load+"%";
 },120);
 
+/* === BACKSOUND === */
+const audio=document.getElementById("bgMusic");
+const btn=document.getElementById("musicBtn");
+audio.volume=0.2;
+let playing=false;
+
+btn.onclick=()=>{
+  if(!playing){
+    audio.play();
+    btn.textContent="MATIKAN BACKSOUND 🔇";
+    playing=true;
+  }else{
+    audio.pause();
+    btn.textContent="PUTAR BACKSOUND 🌙✨";
+    playing=false;
+  }
+};
+
 const dEl=document.getElementById("d");
 const hEl=document.getElementById("h");
 const mEl=document.getElementById("m");
@@ -244,10 +275,7 @@ const sEl=document.getElementById("s");
 
 updateDate();
 updateCountdown();
-setInterval(()=>{
-  updateDate();
-  updateCountdown();
-},1000);
+setInterval(()=>{updateDate();updateCountdown()},1000);
 </script>
 
 </body>
